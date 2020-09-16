@@ -141,6 +141,19 @@ int change_state_log_off(int id) {
     }
 }
 
+int check_status(char *s) {
+    int i = 0;
+    for (i = 0; i< MAX_CLIENTS; i++) {
+        if(clients[i]) {
+            if (strcmp(clients[i]->username,s) == 0){
+                if(clients[i]->state == 0){
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 void store_data(const char *data) {
     FILE *fp = fopen("Server_log.txt", "ab");
@@ -248,7 +261,7 @@ void *chat(void * arg ){
                 sprintf(data, "%s Usuario: %s solicito chatear con: %s \n",chat_date,client->username,message_from_client);
                 printf("%s", data);
                 store_data(data);
-                if (search_client_nickname(message_from_client)) {
+                if (search_client_nickname(message_from_client) && check_status(message_from_client)) {
                     send_connection(client->fd);
                     client->client_to_send_id =  search_client_id(message_from_client);
                     strcpy(client->username_other_user,message_from_client);
